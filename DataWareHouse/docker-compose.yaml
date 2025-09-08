@@ -1,0 +1,40 @@
+services:
+  erp-db:
+    image: postgres:16
+    container_name: erp-db
+    environment:
+      POSTGRES_DB: erp
+      POSTGRES_USER: erp_user
+      POSTGRES_PASSWORD: erp_pass
+    ports:
+      - "5433:5432"   
+    volumes:
+      - erp_data:/var/lib/postgresql/data
+      - ./erp/initdb:/docker-entrypoint-initdb.d:ro
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U erp_user -d erp"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+
+  dw-db:
+    image: postgres:16
+    container_name: dw-db
+    environment:
+      POSTGRES_DB: dw
+      POSTGRES_USER: dw_admin
+      POSTGRES_PASSWORD: dw_admin_pass
+    ports:
+      - "5434:5432"
+    volumes:
+      - dw_data:/var/lib/postgresql/data
+      - ./dw/initdb:/docker-entrypoint-initdb.d:ro
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U dw_admin -d dw"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+
+volumes:
+  erp_data:
+  dw_data:
