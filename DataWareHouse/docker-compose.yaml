@@ -52,6 +52,37 @@ services:
     depends_on:
       - dw-db
 
+  dagster-dev:
+    image: python:3.11-slim
+    container_name: dagster-dev
+    working_dir: /opt/dagster/app
+    volumes:
+      - ./orchestration:/opt/dagster/app
+      - ./dbt:/usr/app
+    environment:
+      AIRBYTE_HOST: host.docker.internal
+      AIRBYTE_PORT: "8000"
+      AIRBYTE_CONNECTION_ID: "51bcabfe-185a-455f-b882-c1a4f7021002"
+      DBT_PROFILES_DIR: /usr/app
+      DBT_PROJECT_DIR: /usr/app
+      PYTHONUNBUFFERED: "1"
+    ports:
+      - "3000:3000"
+    depends_on:
+      dw-db:
+        condition: service_healthy
+    extra_hosts:
+      - "host.docker.internal:host-gateway"   # útil no Linux puro
+    command:
+      [
+        "bash","-lc",
+        "pip install --no-cache-dir \
+          dagster==1.7.15 dagster-webserver==1.7.15 \
+          dagster-airbyte==0.23.15 dagster-dbt==0.23.15 \
+          dbt-postgres==1.9.0 \
+        && dagster dev -m repo -h 0.0.0.0 -p 3000"
+      ]
+
 volumes:
   erp_data:
   dw_data:
