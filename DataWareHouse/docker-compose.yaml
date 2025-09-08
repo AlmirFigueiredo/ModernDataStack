@@ -35,6 +35,23 @@ services:
       timeout: 5s
       retries: 10
 
+  dbt:
+    image: ghcr.io/dbt-labs/dbt-postgres:latest
+    container_name: dbt
+    working_dir: /usr/app
+    volumes:
+      - ./dbt:/usr/app                     
+    environment:
+      DBT_HOST: dw-db                        
+      DBT_PORT: "5432"                       
+      DBT_DB: dw
+      DBT_USER: dw_admin                     
+      DBT_PASS: dw_admin_pass
+      DBT_SCHEMA: silver                     
+      DBT_PROFILES_DIR: /usr/app             
+    depends_on:
+      - dw-db
+
 volumes:
   erp_data:
   dw_data:

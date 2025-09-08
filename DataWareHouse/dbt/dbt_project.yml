@@ -1,0 +1,13 @@
+name: "my_dbt_project"
+version: "1.0"
+config-version: 2
+
+profile: "my_dbt_project"
+
+models:
+  my_dbt_project:
+    +materialized: view
+    silver:
+      +materialized: table
+    gold:
+      +materialized: view
